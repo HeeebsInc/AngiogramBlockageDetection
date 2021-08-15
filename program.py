@@ -146,12 +146,11 @@ class DetectAngiogramDisease:
             ax[idx2].imshow(im)
             ax[idx2].set_title(name)
         plt.show()
-
+        if '.jpeg' in output_path or '.jpg' in output_path or '.png' in output_path:
+            output_path = output_path
+        else:
+            output_path = f'{output_path[:output_path.find(".")]}.jpeg'
         if self.save_all_steps:
-            if '.jpeg' in output_path or '.jpg' in output_path or '.png' in output_path:
-                output_path = output_path
-            else:
-                output_path = f'{output_path[:output_path.find(".")]}.jpeg'
             fig.savefig(output_path)
         else:
             cv2.imwrite(output_path, output_image)
@@ -213,7 +212,7 @@ class DetectAngiogramDisease:
         y = np.array([i[1] for i in self.bboxes] + [i[3] for i in self.bboxes])
         return (x.min(), y.min(), x.max(), y.max())
 
-    def _automatic_brightness_and_contrast(self, image: np.array, clip_hist_percent: int = 1) -> np.aaray:
+    def _automatic_brightness_and_contrast(self, image: np.array, clip_hist_percent: int = 1) -> np.array:
         """
         This function will perform a dynamic calculation for normalizing the brightness in the image.
 
@@ -297,6 +296,6 @@ if __name__ == '__main__':
     param_dict = {
         'input_dir': 'sample-images',
         'output_dir': 'output-images',
-        'save_all_steps': True, #False if you want only the ROI (Region of Interest)
+        'save_all_steps': False, #True if you want to save all steps
     }
     da = DetectAngiogramDisease(**param_dict)
