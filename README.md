@@ -22,9 +22,10 @@
 ### Reference Articles
 - [Liang, Dongxue, et al. “Coronary Angiography Video Segmentation Method for Assisting Cardiovascular Disease Interventional Treatment.” BMC Medical Imaging, vol. 20, no. 1, 2020, doi:10.1186/s12880-020-00460-9.](https://bmcmedimaging.biomedcentral.com/articles/10.1186/s12880-020-00460-9)
 - [Dehkordi, Maryam  Taghizadeh, et al. “Retraction: A Review of Coronary Vessel Segmentation Algorithms.” Journal of Medical Signals &amp; Sensors, vol. 9, no. 1, 2019, p. 76., doi:10.4103/2228-7477.253755.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3317762/)
-
+- [Sharma, Neeraj, et al. “Automated Medical Image Segmentation Techniques.” Journal of Medical Physics, vol. 35, no. 1, 2010, p. 3., doi:10.4103/0971-6203.58777. ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2825001/)
 
 ### Abstract
+ 
 
 ### Description of work accomplished
 
@@ -63,7 +64,12 @@
 
 2) If you pressed Y, a window will pop up displaying one of your images in the sample-images directory
 ![BboxDemo](readme-assets/example1.gif)
-3) 
+3) One the application is done iterating through the images inside [sample-images](sample-images), the output images will be saved in [output-images](output-images)
+
+<p align="center" width="100%">
+    <img width="75%" src="readme-assets/cover-photo.jpg"> 
+</p>
+
 #### Possible errors and how to fix them
 1) `ImportError: libGL.so.1: cannot open shared object file: No such file or directory`
    1) This is an opencv package conflict, in order to fix it you must run `apt-get update && apt-get install ffmpeg libsm6 libxext6  -y`
@@ -79,8 +85,9 @@ This application failed to start because no Qt platform plugin could be initiali
    2) If you are running conda outside of the container, `conda install pyqt`
    3) If you are not running a virtual environment, `pip3 install PyQt5`
 4) If you are stuck on a different error and need assistance, create an issue on this repo and I will be sure to answer ASAP
+
 ### Future Directions
-- experiment ridge detection
+- experiment ridge detection, piece-wise normalization, Harris corner detection and the rolling algorithm
 - use segmentation networks and other machine learning approached to generate similar or better results
-- 
+
 
