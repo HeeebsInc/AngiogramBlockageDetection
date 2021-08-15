@@ -29,32 +29,10 @@
 ### Description of work accomplished
 
 ## Running the program (Tested using Ubuntu 20.04)
-#### **Docker [recommended]**
-To avoid package conflicts, I recommend using docker as I have already created a working environment for running this program
-1) Clone this repository
-   1) `git clone <repo url>`
-2) Install [Docker](https://docs.docker.com/get-docker/)
-3) Pull my image
-   1) `docker pull`
-4) Run the container and mount the project directory to the container
-   1) `docker run --name blockage-detection -v <localpath/to/project>/AngiogramBlockageDetection:/home/AngiogramBlockageDetection -w /home/AngiogramBlockageDetection -itd angiogram-blockage-detection:latest`
-   2) Only thing unique to your computer is switching the `localpath/to/project` with the path to the project you cloned in Step 1
-   3) Command above was testing with Ubuntu
-      1) Because the program uses a GUI, you must mount your display to the container
-5) Outside of the container, move into the project directory you created in step
-6) Gather images you wish to run inference on and place them in `AngiogramBlockageDetection/sample-images`
-7) Move into the running container
-   1) `docker exec -it blockage-detection bash`
-8) Move into the project directory
-   1) `cd AngiogramBlockageDetection`
-9) Run the program
-   1) `python program.py`
-10) See below for sample output
 
-#### Without Docker
-4) Clone repository onto your local machine
+1) Clone repository onto your local machine
    1) `git clone <repo url>`
-5) Set up virtual environment (conda, etc.) [Recommended]
+2) Set up virtual environment (conda, etc.) [Recommended]
    1) Install Miniconda 
       1) `cd /tmp`
       2) `apt-get update && apt-get install wget -y && wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh`
@@ -66,14 +44,13 @@ To avoid package conflicts, I recommend using docker as I have already created a
          1) `conda create --name blockage-detection python=3.9`
          2) `conda activate blockage-detection`
             1) You should now see that `(base)` has changed to `blockage-detection`
-6) Install necessary packages
+3) Install necessary packages
    1) [conda] `pip install opencv-contrib-python matplotlib tqdm && conda install pyqt`
    2) [no virtual enviornment] `pip3 install opencv-contrib-python matplotlib tqdm PyQT5`
-7) Gather images you wish to run inference on and place them in [sample-images](sample-images)
-8) Run the program
+4) Gather images you wish to run inference on and place them in [sample-images](sample-images)
+5) Run the program
    1) [conda] `python program.py`
    2) [no virtual environment] `python3 program.py`
-9) see below for sample output
 
 #### Sample Output
 1) Upon running [program.py](program.py) a command line prompt will get displayed asking if you wish to specify a region of interest
@@ -81,11 +58,12 @@ To avoid package conflicts, I recommend using docker as I have already created a
    2) Press Y to draw the region of interest | Press N to let the algorithm process the entire thing
    
 <p align="center" width="100%">
-    <img width="75%" src="readme-assets/start.png"> 
+    <img width="85%" src="readme-assets/start.png"> 
 </p>
 
-
-2) 
+2) If you pressed Y, a window will pop up displaying one of your images in the sample-images directory
+![BboxDemo](readme-assets/example1.gif)
+3) 
 #### Possible errors and how to fix them
 1) `ImportError: libGL.so.1: cannot open shared object file: No such file or directory`
    1) This is an opencv package conflict, in order to fix it you must run `apt-get update && apt-get install ffmpeg libsm6 libxext6  -y`
