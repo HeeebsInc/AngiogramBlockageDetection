@@ -16,6 +16,16 @@ class DetectAngiogramDisease:
         :param save_all_steps: If True, the program will save each step of the process instead of only saving the final image.  (Bool)
 
         """
+        print('='* 125)
+        print(''' ____   _       ___      __  __  _   ____   ____    ___      ___      ___  ______    ___     __  ______  ____  ___   ____  
+|    \ | |     /   \    /  ]|  |/ ] /    | /    |  /  _]    |   \    /  _]|      |  /  _]   /  ]|      ||    |/   \ |    \ 
+|  o  )| |    |     |  /  / |  ' / |  o  ||   __| /  [_     |    \  /  [_ |      | /  [_   /  / |      | |  ||     ||  _  |
+|     || |___ |  O  | /  /  |    \ |     ||  |  ||    _]    |  D  ||    _]|_|  |_||    _] /  /  |_|  |_| |  ||  O  ||  |  |
+|  O  ||     ||     |/   \_ |     \|  _  ||  |_ ||   [_     |     ||   [_   |  |  |   [_ /   \_   |  |   |  ||     ||  |  |
+|     ||     ||     |\     ||  .  ||  |  ||     ||     |    |     ||     |  |  |  |     |\     |  |  |   |  ||     ||  |  |
+|_____||_____| \___/  \____||__|\_||__|__||___,_||_____|    |_____||_____|  |__|  |_____| \____|  |__|  |____|\___/ |__|__|
+''')
+        print('='*125)
         self.save_all_steps = save_all_steps
         self.input_dir = input_dir
         self.output_dir = output_dir
