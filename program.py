@@ -87,8 +87,7 @@ class DetectAngiogramDisease:
 
         #this creates a 12 blocks to perform the adaptive thresholding.  Because x-rays are not consistent in where things are
         #present in the image, using 12 blocks will often include all necessary pixel distributions for the thresholding
-        block_size = int(img.shape[0] / 12)
-        block_size = block_size + 1 if block_size % 2 == 0 else block_size
+        block_size = int(blurred.shape[0] / 12)
         block_size = block_size + 1 if block_size % 2 == 0 else block_size
 
         #perform adaptive thresholding using the block size.  This will use dynamic thrshold and turn every pixel above this number to 255

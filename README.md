@@ -28,6 +28,7 @@
  
 
 ### Description of work accomplished
+To follow the code process, see [technical jupyter notebook](Notebooks/readme-steps.ipynb)
 
 ## Running the program (Tested using Ubuntu 20.04)
 
@@ -89,5 +90,6 @@ This application failed to start because no Qt platform plugin could be initiali
 ### Future Directions
 - experiment ridge detection, piece-wise normalization, Harris corner detection and the rolling algorithm
 - use segmentation networks and other machine learning approached to generate similar or better results
-
+- make the function [_find_if_close](program.py) for calculating the euclidean distance between two contours faster
+- Test with images that are smaller than (500,500) without having to resize them to larger dimensions
 
