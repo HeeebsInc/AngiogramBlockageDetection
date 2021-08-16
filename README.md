@@ -28,7 +28,7 @@
  
 
 ### Description of work accomplished
-To follow the code process, see [technical jupyter notebook](Notebooks/readme-steps.ipynb)
+To follow the code process, see [technical jupyter notebook](technical-notebook.ipynb)
 
 ## Running the program (Tested using Ubuntu 20.04)
 
@@ -57,7 +57,7 @@ To follow the code process, see [technical jupyter notebook](Notebooks/readme-st
 #### Sample Output
 1) Upon running [program.py](program.py) a command line prompt will get displayed asking if you wish to specify a region of interest
    1) This step is to determine if you want the algorithm to process the entire image or just a region of interest that you get to draw
-   2) Press Y to draw the region of interest | Press N to let the algorithm process the entire thing
+   2) Press Y to draw the region of interest | Press N to let the algorithm process the entire image
    
 <p align="center" width="100%">
     <img width="85%" src="readme-assets/start.png"> 
@@ -65,7 +65,8 @@ To follow the code process, see [technical jupyter notebook](Notebooks/readme-st
 
 2) If you pressed Y, a window will pop up displaying one of your images in the sample-images directory
 ![BboxDemo](readme-assets/example1.gif)
-3) One the application is done iterating through the images inside [sample-images](sample-images), the output images will be saved in [output-images](output-images)
+3) Once the application is done iterating through the images inside [sample-images](sample-images), the output images will be saved in [output-images](output-images)
+   1) The default configuration will save only the output image with the detection, however, if you want to every step of the process, change `save_all_steps` on the bottom of [program.py](program.py) to `True` 
 
 <p align="center" width="100%">
     <img width="75%" src="readme-assets/cover-photo.jpg"> 
