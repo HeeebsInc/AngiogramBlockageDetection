@@ -49,26 +49,26 @@ The process consists of **10 steps**
 1) Load an image into memory
 
 <p align="center" width="100%">
-    <img width="75%" src="readme-assets/steps/step1.png"> 
+    <img width="50%" src="readme-assets/steps/step1.png"> 
 </p>
 
 2) Crop image borders by 10%. In X-ray images, there often can be black/white borders around the image that would negatively impact this segmentation algorithm.  
 
 <p align="center" width="100%">
-    <img width="75%" src="readme-assets/steps/step2.png"> 
+    <img width="50%" src="readme-assets/steps/step2.png"> 
 </p>
 
 3) Convert the cropped image to gray scale
 
 <p align="center" width="100%">
-    <img width="75%" src="readme-assets/steps/step3.png"> 
+    <img width="50%" src="readme-assets/steps/step3.png"> 
 </p>
 
-4) Apply brightness correction to the gray scaled image
+4) Apply brightness correction to the gray scaled image.  This will ensure that the distributions among pixel amplitudes is normalized.  
    1) The algorithm works as follows...
 
 <p align="center" width="100%">
-    <img width="75%" src="readme-assets/steps/step4.png"> 
+    <img width="50%" src="readme-assets/steps/step4.png"> 
 </p>
 
 ## Running the program (Tested using Ubuntu 20.04)
