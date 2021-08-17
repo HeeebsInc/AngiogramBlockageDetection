@@ -75,7 +75,7 @@ The process consists of **10 steps**
    1) A median blur is applied with the parameters...
 
 <p align="center" width="100%">
-    <img width="85%" src="readme-assets/steps/step5.jpg"> 
+    <img width="85%" src="readme-assets/steps/step5_new.jpg"> 
 </p>
 
 6) **Create blocksize using a neighborhood of 12**
