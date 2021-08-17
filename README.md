@@ -25,10 +25,51 @@
 - [Sharma, Neeraj, et al. “Automated Medical Image Segmentation Techniques.” Journal of Medical Physics, vol. 35, no. 1, 2010, p. 3., doi:10.4103/0971-6203.58777. ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2825001/)
 
 ### Abstract
- 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```A coronary angiogram is a low-risk medical technique used to visualize blood vessels and arteries, and can be used to both diagnose and treat heart and blood vessel conditions. To conduct this procedure, a doctor first injects a dye into a patient’s blood vessel then takes many X-ray images of this same area. Because the dye is visible in an X-ray, the doctor can determine if there is blockage (cardiovascular disease) based on the occlusion seen 
+throughout the blood vessels.  My goal for this project is to automate the process of examining these X-ray images by using a light-weight 
+segmentation algorithm that can locate these areas of occlusion. ```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```In the current medical industry, segmentation is a popular procedure for 
+processing medical imagery. These methods are used to provide computer-aided diagnosis (CAD) and locate possible regions of 
+interest (ROIs) that would be important for examining a patient’s condition and/or symptoms.  However, the types of segmentation 
+algorithms differ depending on their use case as each imaging system has its own limitations and specifications. For example, 
+segmentation is found in common procedures such as MRIs, CT, and PET scans which use segmentation for performing amplitude 
+segmentation based on histogram features, edge based segmentation, and region based segmentation (Sharma, 2010).  Typical 
+segmentation methods utilize a threshold that is used to compare to each pixel.  If a given pixel is lower than the threshold, 
+that pixel is converted to 0 (black) while if it is higher, it is converted to 255 (white).  This can be performed in the 
+opposite direction at the discretion of the operator. ```
+
+<p align="center" width="100%">
+    <img width="75%" src="readme-assets/basic-threshold-formula.png"> 
+</p>
 
 ### Description of work accomplished
 To follow the code process, see [technical jupyter notebook](technical-notebook.ipynb)
+The process consists of **10 steps**
+1) Load an image into memory
+
+<p align="center" width="100%">
+    <img width="75%" src="readme-assets/steps/step1.png"> 
+</p>
+
+2) Crop image borders by 10%. In X-ray images, there often can be black/white borders around the image that would negatively impact this segmentation algorithm.  
+
+<p align="center" width="100%">
+    <img width="75%" src="readme-assets/steps/step2.png"> 
+</p>
+
+3) Convert the cropped image to gray scale
+
+<p align="center" width="100%">
+    <img width="75%" src="readme-assets/steps/step3.png"> 
+</p>
+
+4) Apply brightness correction to the gray scaled image
+   1) The algorithm works as follows...
+
+<p align="center" width="100%">
+    <img width="75%" src="readme-assets/steps/step4.png"> 
+</p>
 
 ## Running the program (Tested using Ubuntu 20.04)
 
