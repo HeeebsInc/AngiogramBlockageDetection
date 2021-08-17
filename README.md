@@ -49,33 +49,33 @@ The process consists of **10 steps**
 1) **Load an image into memory**
 
 <p align="center" width="100%">
-    <img width="35%" src="readme-assets/steps/step1.png"> 
+    <img width="35%" src="readme-assets/steps/step1.jpg"> 
 </p>
 
 2) **Crop image borders by 10%**. In X-ray images, there often can be black/white borders around the image that would negatively impact this segmentation algorithm.  
 
 <p align="center" width="100%">
-    <img width="35%" src="readme-assets/steps/step2.png"> 
+    <img width="35%" src="readme-assets/steps/step2.jpg"> 
 </p>
 
 3) **Convert the cropped image to gray scale**
 
 <p align="center" width="100%">
-    <img width="35%" src="readme-assets/steps/step3.png"> 
+    <img width="35%" src="readme-assets/steps/step3.jpg"> 
 </p>
 
 4) **Apply brightness correction to the gray scaled image**.  This will ensure that the distributions among pixel amplitudes is normalized.  
    1) The algorithm works as follows...
 
 <p align="center" width="100%">
-    <img width="99%" src="readme-assets/steps/step4.png"> 
+    <img width="99%" src="readme-assets/steps/step4.jpg"> 
 </p>
 
 5) **Blur the image**.  This step will reduce noise around the image and allow for better segmentation
    1) A median blur is applied with the parameters...
 
 <p align="center" width="100%">
-    <img width="85%" src="readme-assets/steps/step5.png"> 
+    <img width="85%" src="readme-assets/steps/step5.jpg"> 
 </p>
 
 6) **Create blocksize using a neighborhood of 12**
@@ -83,14 +83,14 @@ The process consists of **10 steps**
    2) This block size is utilized for adaptive thresholding, where the algorithm will determine a best threshold based on values calculated within each of these blocks
 
 <p align="center" width="100%">
-    <img width="35%" src="readme-assets/steps/step6.png"> 
+    <img width="35%" src="readme-assets/steps/step6.jpg"> 
 </p>
 
 7) **Apply adaptive thresholding using the block size calculated above**
    1) This algorithm involves these steps..
 
 <p align="center" width="100%">
-    <img width="85%" src="readme-assets/steps/step7.png"> 
+    <img width="85%" src="readme-assets/steps/step7.jpg"> 
 </p>
 
 8) **Get contours of thresholded image**
@@ -99,7 +99,7 @@ The process consists of **10 steps**
    3) Filling it in black will allow us for further thresholding later on
 
 <p align="center" width="100%">
-    <img width="35%" src="readme-assets/steps/step8.png"> 
+    <img width="35%" src="readme-assets/steps/step8.jpg"> 
 </p>
 
 9) **Perform another round of thresholding to include only the contoured areas above**.  After, conduct **dilation** to reduce the space between the contours
@@ -107,7 +107,7 @@ The process consists of **10 steps**
    2) Dilation is the process of ..
    
 <p align="center" width="100%">
-    <img width="99%" src="readme-assets/steps/step9.png"> 
+    <img width="99%" src="readme-assets/steps/step9.jpg"> 
 </p>
 
 10) **A final round of contour estimation**. Here, we will get the contours of the dilated image above.  These contours will be used to calculate the euclidean distance between each blood vessel. 
@@ -115,7 +115,7 @@ The process consists of **10 steps**
     2) The contour distance formula is as follows..
 
 <p align="center" width="100%">
-    <img width="85%" src="readme-assets/steps/step10.png"> 
+    <img width="85%" src="readme-assets/steps/step10.jpg"> 
 </p>
 
 ## Running the program (Tested using Ubuntu 20.04)
