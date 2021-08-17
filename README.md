@@ -49,33 +49,33 @@ The process consists of **10 steps**
 1) **Load an image into memory**
 
 <p align="center" width="100%">
-    <img width="50%" src="readme-assets/steps/step1.png"> 
+    <img width="25%" src="readme-assets/steps/step1.png"> 
 </p>
 
 2) **Crop image borders by 10%**. In X-ray images, there often can be black/white borders around the image that would negatively impact this segmentation algorithm.  
 
 <p align="center" width="100%">
-    <img width="50%" src="readme-assets/steps/step2.png"> 
+    <img width="25%" src="readme-assets/steps/step2.png"> 
 </p>
 
 3) **Convert the cropped image to gray scale**
 
 <p align="center" width="100%">
-    <img width="50%" src="readme-assets/steps/step3.png"> 
+    <img width="25%" src="readme-assets/steps/step3.png"> 
 </p>
 
 4) **Apply brightness correction to the gray scaled image**.  This will ensure that the distributions among pixel amplitudes is normalized.  
    1) The algorithm works as follows...
 
 <p align="center" width="100%">
-    <img width="50%" src="readme-assets/steps/step4.png"> 
+    <img width="99%" src="readme-assets/steps/step4.png"> 
 </p>
 
 5) **Blur the image**.  This step will reduce noise around the image and allow for better segmentation
    1) A median blur is applied with the parameters...
 
 <p align="center" width="100%">
-    <img width="50%" src="readme-assets/steps/step5.png"> 
+    <img width="85%" src="readme-assets/steps/step5.png"> 
 </p>
 
 6) **Create blocksize using a neighborhood of 12**
@@ -83,7 +83,7 @@ The process consists of **10 steps**
    2) This block size is utilized for adaptive thresholding, where the algorithm will determine a best threshold based on values calculated within each of these blocks
 
 <p align="center" width="100%">
-    <img width="50%" src="readme-assets/steps/step6.png"> 
+    <img width="25%" src="readme-assets/steps/step6.png"> 
 </p>
 
 7)
