@@ -10,9 +10,17 @@
 - [Medium](https://medium.com/@heeebsinc)
 
 ### Prompt
-`Image segmentation has been one of the classical image processing techniques. It intends to abstract some important feature from an image based on its global and/or local amplitude distribution. One of the major application areas of this technique is medical imaging, where segmentation can automatically highlight the objects (e.g. vessel, cardiac chamber etc.) to help physicians diagnosing disease.`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```Image segmentation has been one of the classical image processing techniques. 
+It intends to abstract some important feature from an image based on its global and/or local amplitude distribution. 
+One of the major application areas of this technique is medical imaging, where segmentation can automatically highlight the objects 
+(e.g. vessel, cardiac chamber etc.) to help physicians diagnosing disease.```
 
-`In this project, you are to apply image segmentation techniques to X-ray angiography, where X-ray images are taken when an X-ray absorbing substance is injected into the patient's blood stream to produce contrast. The resulting X-ray images have dark regions representing the blood flow within vessels. Your system should be able to automatically locate any occlusion and follow the surrounding vessel wall to compute the ratio between the minimum and nominal vessel diameters. Such results are practically important in detecting coronary disease. Your system should also accept user input of occlusion locations and perform the same percent occlusion measurement in that particular area.`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```In this project, you are to apply image segmentation techniques to X-ray angiography, 
+where X-ray images are taken when an X-ray absorbing substance is injected into the patient's blood stream to produce contrast. 
+The resulting X-ray images have dark regions representing the blood flow within vessels. Your system should be able to automatically 
+locate any occlusion and follow the surrounding vessel wall to compute the ratio between the minimum and nominal vessel diameters. 
+Such results are practically important in detecting coronary disease. Your system should also accept user input of occlusion locations 
+and perform the same percent occlusion measurement in that particular area.```
 
 
 ### Data
@@ -65,7 +73,22 @@ The process consists of **10 steps**
 </p>
 
 4) **Apply brightness correction to the gray scaled image**.  This will ensure that the distributions among pixel amplitudes is normalized.  
-   1) The algorithm works as follows...
+Function [_automatic_brightness_and_contrast](program.py) works by: 
+   1) Calculating the cumulative distribution from the histogram of a gray scaled image
+
+   2) Find the pixel value with the max number of pixels, and clip it with `clip_hist_percent = 1`
+
+   3) Split the clipped histogram into two parts (1) left = values below `clip_hist_percent` and (2) right = values above `clip_hist_percent`
+
+   4) Calculate alpha and beta values
+
+   `alpha = 255 / (maximum_gray - minimum_gray)`
+
+   `beta = -minimum_gray * alpha`
+
+   5) Retrieve final scaled values using 
+
+   `auto_result = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)`
 
 <p align="center" width="100%">
     <img width="99%" src="readme-assets/steps/step4.jpg"> 
