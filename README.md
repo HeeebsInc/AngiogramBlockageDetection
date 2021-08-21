@@ -95,15 +95,36 @@ Function [_automatic_brightness_and_contrast](program.py) works by:
 </p>
 
 5) **Blur the image**.  This step will reduce noise around the image and allow for better segmentation
-   1) A median blur is applied with the parameters...
+   - **Median Blur** is a commonly used method for reducing salt and pepper noise.  
+   - To apply a median blur, you first determine a _**kernel size**_.  In this project, I used a kernel size of 5.  The kernel size is used to determine the number of neighbors that will be incorporated in the blur method.
+     - ```cv2.medianBlur(image, ksize = 5)```
+
+   - For example, with a neighborhood size of 5x5, 25 pixels will be used to calculate the median of all pixels. 
+   - After gathering the median value, the center pixel in that 5x5 area will become that median value.  
+   - The reason this method is so useful for salt and pepper noise is because the center pixel will _always_ be replaced with a pixel that is in the original image- as using the median calculation is more robust to outliers than compared to using an average or gaussian blur method.   
 
 <p align="center" width="100%">
     <img width="85%" src="readme-assets/steps/step5_new.jpg"> 
 </p>
 
 6) **Create blocksize using a neighborhood of 12**
-   1) This process involves separating the image into equal parts (blocks) so that each area contains 12 pixels (neighbors).
-   2) This block size is utilized for adaptive thresholding, where the algorithm will determine a best threshold based on values calculated within each of these blocks
+- This process involves separating the image into equal partitions so that there are a specific number of blocks along the y axis. In this project, we ensured that there are 12 blocks along the height of the image. 
+- Because each block is created around a central pixel, the blocksize of an image must be an odd number and each block must have square dimensions.
+- For example, if an image has a dimension of 491x393 (WxH) pixels and we wish to have 12 blocks along the Y (height) axis, it will require each block to have a height and width of 33 pixels.  Knowing that each block will have a height and width of 33, we can divide the the x axis by that number to determine how many boxes we can fit along the X axis.   
+
+```
+height_boxes = 12
+block_size = int(image_height / height_boxes) #int(393 / 12) = 32 (rounded down)
+if block_size % 2 == 0: #this means it is even
+    block_size += 1 #block size = 33
+
+width_boxes = int(image_width / block_size) #int(491 / 33) = 14 (rounded down)
+if width_boxes % 2 == 0: #this means it is even 
+    width_boxes += 1
+
+```
+
+- This block size is utilized for adaptive thresholding, where the algorithm will determine the best threshold based on values calculated within each of these blocks.  (Explanation for how this algorithm works is explained in the next step). determine a best threshold based on values calculated within each of these blocks
 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step6.jpg"> 
