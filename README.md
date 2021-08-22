@@ -1,6 +1,10 @@
 # Angiogram Blockage Detection | CPE-645-FinalProject
 
-![CoverPhoto](readme-assets/CoverVid.gif)
+<p align="center">
+  <img src="readme-assets/CoverVid.gif" alt="animated" />
+</p>
+
+
 
 ## Contributer
 - Samuel Mohebban 
