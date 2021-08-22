@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 
 class DetectAngiogramDisease:
-    def __init__(self, input_dir: str, output_dir: str, save_all_steps: bool = False):
+    def __init__(self, input_dir: str, output_dir: str):
         """
         Instantiation of the program.  This program will take an input directory that contains images, and will run each
         through a series of processes to determine if the angiogram images show cardiovascular disease.
@@ -26,7 +26,6 @@ class DetectAngiogramDisease:
 |_____||_____| \___/  \____||__|\_||__|__||___,_||_____|    |_____||_____|  |__|  |_____| \____|  |__|  |____|\___/ |__|__|
 ''')
         print('='*125)
-        self.save_all_steps = save_all_steps
         self.input_dir = input_dir
         self.output_dir = output_dir
         self._run()
@@ -48,11 +47,17 @@ class DetectAngiogramDisease:
             if get_user_input == 'y':
                 #this will call the drawing function so that we can extract the
                 #ROI  (xmin, ymin, xmax, ymax)
-                xmin, ymin, xmax, ymax = self._draw_on_image(img, full_image_path)
-                #crop the image using the ROI region
-                cropped_img = img[ymin:ymax, xmin: xmax]
-                #resize the image to a flat dim so that it will perform well
-                cropped_img = cv2.resize(cropped_img, (500,500), cv2.INTER_LINEAR)
+                coord = self._draw_on_image(img, full_image_path)
+                if len(coord) == 0:
+                    x_new = int(img.shape[1] * .1)
+                    y_new = int(img.shape[0] * .1)
+                    cropped_img = img[y_new:img.shape[0] - y_new, x_new: img.shape[1] - x_new]
+                else:
+                    xmin, ymin, xmax, ymax = coord
+                    #crop the image using the ROI region
+                    cropped_img = img[ymin:ymax, xmin: xmax]
+                    #resize the image to a flat dim so that it will perform well
+                    cropped_img = cv2.resize(cropped_img, (500,500), cv2.INTER_LINEAR)
                 self.run_segmentation(cropped_img, output_path)
 
             else:
@@ -96,7 +101,7 @@ class DetectAngiogramDisease:
 
         #determine the min contour area.  Having a higher number will reduce contours over noise but can also pose the problem
         #of missing the vessel
-        min_contour_area = 1250
+        min_contour_area = 0
 
         #perform thresholding using Ellipse and a kernel of 3x3.
         #Then apply contours to find the edges within the thresholded image
@@ -109,8 +114,7 @@ class DetectAngiogramDisease:
 
         for idx1, c1 in enumerate(contours):
             cv2.drawContours(edged_contour, [c1], -1, (0, 0, 0), -1)
-            if idx1 == len(contours) - 1:
-                break
+
 
         edged_contour = cv2.cvtColor(edged_contour, cv2.COLOR_BGR2GRAY)
         #perform another round of thresholding where it will turn every pixel above 0 to 255
@@ -121,6 +125,7 @@ class DetectAngiogramDisease:
         img_dict['threshed edged contour'] = threshed
         img_dict['dilated'] = dilated
 
+        min_contour_area = 1250
         output_image = img.copy()
         #perform another contour operation to get the outline of the dilated image
         thresh = cv2.morphologyEx(dilated, cv2.MORPH_ELLIPSE, np.ones((3, 3), np.uint8))
@@ -128,8 +133,6 @@ class DetectAngiogramDisease:
         contours = [i for i in contours if cv2.contourArea(i) > min_contour_area]
         detections = 0
         for idx1, c1 in enumerate(contours):
-            if idx1 == len(contours) - 1:
-                break
             for idx2, c2 in enumerate(contours):
                 if idx2 == idx1:
                     continue
@@ -157,12 +160,22 @@ class DetectAngiogramDisease:
         plt.show()
         if '.jpeg' in output_path or '.jpg' in output_path or '.png' in output_path:
             output_path = output_path
+            reversed_output_path = output_path[::-1]
+            reversed_output_path = reversed_output_path[reversed_output_path.find('.')+1:]
+            figure_path = f'{reversed_output_path[::-1]}_steps.jpg'
         else:
-            output_path = f'{output_path[:output_path.find(".")]}.jpeg'
-        if self.save_all_steps:
-            fig.savefig(output_path)
-        else:
-            cv2.imwrite(output_path, output_image)
+            reversed_output_path = output_path[::-1]
+            reversed_output_path = reversed_output_path[reversed_output_path.find('.')+1:][::-1]
+            output_path = f'{reversed_output_path}.jpg'
+            figure_path = f'{reversed_output_path}_steps.jpg'
+        fig.savefig(figure_path)
+        cv2.imwrite(output_path, output_image)
+
+
+        #this will display the output image
+        cv2.imshow('Output Image | Press q to exit', output_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         print(f'FINISHED SAVING {output_path} IMAGE')
         return img
 
@@ -216,7 +229,8 @@ class DetectAngiogramDisease:
             if cv2.waitKey(20) & 0xFF == ord('q'):
                 break
         cv2.destroyAllWindows()
-
+        if len(self.bboxes) == 0:
+            return ()
         x = np.array([i[0] for i in self.bboxes] + [i[2] for i in self.bboxes])
         y = np.array([i[1] for i in self.bboxes] + [i[3] for i in self.bboxes])
         return (x.min(), y.min(), x.max(), y.max())
@@ -301,10 +315,11 @@ class DetectAngiogramDisease:
             else:
                 return user_input.lower()
 
+
+
 if __name__ == '__main__':
     param_dict = {
         'input_dir': 'sample-images',
         'output_dir': 'output-images',
-        'save_all_steps': False, #True if you want to save all steps
     }
     da = DetectAngiogramDisease(**param_dict)

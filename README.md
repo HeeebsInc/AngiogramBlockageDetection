@@ -107,7 +107,7 @@ Function [_automatic_brightness_and_contrast](program.py) works by:
     <img width="85%" src="readme-assets/steps/step5_new.jpg"> 
 </p>
 
-6) **Create blocksize using a neighborhood of 12**
+6) **Create blocksize using 12 boxes along the height of the image**
 - This process involves separating the image into equal partitions so that there are a specific number of blocks along the y axis. In this project, we ensured that there are 12 blocks along the height of the image. 
 - Because each block is created around a central pixel, the blocksize of an image must be an odd number and each block must have square dimensions.
 - For example, if an image has a dimension of 491x393 (WxH) pixels and we wish to have 12 blocks along the Y (height) axis, it will require each block to have a height and width of 33 pixels.  Knowing that each block will have a height and width of 33, we can divide the the x axis by that number to determine how many boxes we can fit along the X axis.   
@@ -125,17 +125,50 @@ if width_boxes % 2 == 0: #this means it is even
 ```
 
 - This block size is utilized for adaptive thresholding, where the algorithm will determine the best threshold based on values calculated within each of these blocks.  (Explanation for how this algorithm works is explained in the next step). determine a best threshold based on values calculated within each of these blocks
+- The calculation used in [program.py](program.py) is dynamic, so these numbers are specific to the size of the image being processed
 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step6.jpg"> 
 </p>
 
 7) **Apply adaptive thresholding using the block size calculated above**
-   1) This algorithm involves these steps..
+- Here, I applied mean adaptive thresholding using a blockSize of 33 and a constant of 10
+- When applying adaptive thresholding, you have the option of using _**Arithmetic**_ or _**Gaussian**_ mean for calculating the threshold within each image.  In this project, I used Arithmetic mean (`cv2.ADAPTIVE_THRESH_MEAN_C`) as I believe Gaussian mean is not a good method for this application.  In Gaussian mean (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`), the _**weighted**_ average is performed so that the central pixel of the block contributes more weight to the average. In the image below, we can see that Gaussian mean reduces noise present in the image, however, it does not preserve the integrity of the vessels as well as arithmetic mean.  
+
+`cv.ADAPTIVE_THRESH_MEAN_C`: The threshold value is the mean of the neighbourhood area minus the constant C.
+
+`cv.ADAPTIVE_THRESH_GAUSSIAN_C`: The threshold value is a gaussian-weighted sum of the neighbourhood values minus the constant C.
+
+<p align="center" width="50%">
+    <img width="15%" src="readme-assets/Gaussian.png"> 
+</p>
+
+- The threshold for each block is calculated by taking the arithmetic mean of the blockSizexBlockSize and subtracting it by C (10).  In the example in the previous step, using 12 block rows yields a block_size of 33.  Given this, we will take the arithmetic average pixel amplitude within each 33x33 block and subtract that average by 10 to determine the threshold for that specific block. As mentioned in the previous step, the block size will change based on the original image dimension so the match explained here applies _only_ to that image - however, the logic is the same. In the previous step, I obtained 12 block rows (y) and 15 block columns (x).  Therefore, there will be a total of 180 (12 * 15) thresholds that correspond to each partitioned area.  
+
+<p align="center" width="50%">
+    <img width="15%" src="readme-assets/Adaptive_Threshold.png"> 
+</p>
+
+- After determining the thresholds for each specific block, an algorithm is applied where each pixel in a particular block is converted to either 0 (black) or 255 (white) based on that block's calculated threshold. There are _**2 procedures**_ that are popular:
+
+1) `cv2.THRESH_BINARY`: Each pixel greater than or equal to the threshold value will be converted to a defined max value (255) while every pixel below the threshold will be converted to 0 (black)
 
 <p align="center" width="100%">
-    <img width="85%" src="readme-assets/steps/step7.jpg"> 
+    <img width="25%" src="readme-assets/THRESH_BINARY.png"> 
 </p>
+
+2) `cv2.THRESH_BINARY_INV`: Each pixel greater than or equal to the threshold value will be converted to 0 (black) while every pixel below the threshold will be converted to a defined max value (255)
+
+<p align="center" width="100%">
+    <img width="25%" src="readme-assets/THRESH_BINARY_INV.png"> 
+</p>
+
+- In this project, I used `cv2.THRESH_BINARY_INV` which converted every pixel above the threshold to black while converting pixels below the threshold to white (max value of 255).  The reason I did this is because the darker regions in the image are considered blood vessels and are the regions of interest.  Also, performing this conversion makes contour calculation easier to perform (explained in the next step)
+
+```
+threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, block_size, 10)
+```
+
 
 8) **Get contours of thresholded image**
    1) The contour algorithm involves these steps..
