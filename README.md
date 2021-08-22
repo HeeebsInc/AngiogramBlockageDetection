@@ -139,7 +139,7 @@ if width_boxes % 2 == 0: #this means it is even
 `cv.ADAPTIVE_THRESH_GAUSSIAN_C`: The threshold value is a gaussian-weighted sum of the neighbourhood values minus the constant C.
 
 <p align="center" width="50%">
-    <img width="15%" src="readme-assets/Gaussian.png"> 
+    <img width="15%" src="readme-assets/Gaussian_Mean.png"> 
 </p>
 
 - The threshold for each block is calculated by taking the arithmetic mean of the blockSizexBlockSize and subtracting it by C (10).  In the example in the previous step, using 12 block rows yields a blockSize of 33.  Given this, we will take the arithmetic average pixel amplitude within each 33x33 block and subtract that average by 10 to determine the threshold for that specific block. As mentioned in the previous step, the blockSize will change based on the original image dimension so the match explained here applies _only_ to that image - however, the logic is the same. In the previous step, I obtained 12 block rows (y) and 15 block columns (x).  Therefore, there will be a total of 180 (12 * 15) thresholds that correspond to each partitioned area.  
