@@ -104,7 +104,7 @@ Function [_automatic_brightness_and_contrast](program.py) works by:
    - The reason this method is so useful for salt and pepper noise is because the center pixel will _always_ be replaced with a pixel that is in the original image- as using the median calculation is more robust to outliers than compared to using an average or gaussian blur method.   
 
 <p align="center" width="100%">
-    <img width="85%" src="readme-assets/steps/step5_new.jpg"> 
+    <img width="85%" src="readme-assets/steps/step5.jpg"> 
 </p>
 
 6) **Create blocksize using 12 boxes along the height of the image**
@@ -169,6 +169,9 @@ if width_boxes % 2 == 0: #this means it is even
 threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, block_size, 10)
 ```
 
+<p align="center" width="100%">
+    <img width="85%" src="readme-assets/steps/step7.jpg"> 
+</p>
 
 8) **Get contours of thresholded image**
    1) The contour algorithm involves these steps..
