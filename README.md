@@ -108,9 +108,9 @@ Function [_automatic_brightness_and_contrast](program.py) works by:
 </p>
 
 6) **Create `blockSize` using 12 boxes along the height of the image**
-- This process involves separating the image into equal partitions so that there are a specific number of blocks along the y axis. In this project, we ensured that there are 12 blocks along the height of the image. 
+- This process involves separating the image into equal partitions so that there are a specific number of blocks along the y-axis. In this project, I ensured that there are 12 blocks along the height of the image. 
 - Because each block is created around a central pixel, the blockSize of an image must be an odd number and each block must have square dimensions.
-- For example, if an image has a dimension of 491x393 (WxH) pixels and we wish to have 12 blocks along the Y (height) axis, it will require each block to have a height and width of 33 pixels.  Knowing that each block will have a height and width of 33, we can divide the the x axis by that number to determine how many boxes we can fit along the X axis.   
+- For example, if an image has a dimension of 491x393 (WxH) pixels and we wish to have 12 blocks along the y-axis (height), it will require each block to have a height and width of 33 pixels. Given the height and width of each block, we can divide the width of the image by 33 to determine how many boxes we can fit along the x-axis.   
 
 ```
 height_boxes = 12
@@ -125,13 +125,12 @@ if width_boxes % 2 == 0: #this means it is even
 ```
 
 - The calculation used in [program.py](program.py) is dynamic, so these numbers are specific to the size of the image being processed
-- This blockSize is utilized for adaptive thresholding, where the algorithm will determine the best threshold based on values calculated within each of these blocks.  (Explanation for how this algorithm works is explained in the next step). 
+- This blockSize is utilized when applying adaptive threshold, where an algorithm will determine the best threshold based on values calculated within each of these blocks.  (Explanation for how this algorithm works is explained in the next step). 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step6.jpg"> 
 </p>
 
 7) **Apply adaptive thresholding using the block size calculated above**
-### Step 7:  Apply Adaptive thresholding 
 - Here, I applied mean adaptive thresholding using a blockSize of 33 and a constant of 10
 - When applying adaptive thresholding, you have the option of using _**Arithmetic**_ or _**Gaussian**_ mean for calculating the threshold within each image.  In this project, I used Arithmetic mean (`cv2.ADAPTIVE_THRESH_MEAN_C`) as I believe Gaussian mean is not a good method for this application.  In Gaussian mean (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`), the _**weighted**_ average is performed so that the central pixel of the block contributes more weight to the average. In the [example image](readme-assets/steps/step7.jpg) below cell below, we can see that Gaussian mean reduces noise present in the image, however, it does not preserve the integrity of the vessels as well as arithmetic mean.  
 
