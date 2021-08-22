@@ -145,13 +145,13 @@ if width_boxes % 2 == 0: #this means it is even
 `cv.ADAPTIVE_THRESH_GAUSSIAN_C`: The threshold value is a gaussian-weighted sum of the neighbourhood values minus the constant C.
 
 <p align="center" width="50%">
-    <img width="15%" src="readme-assets/Gaussian_Mean.png"> 
+    <img width="25%" src="readme-assets/Gaussian_Mean.png"> 
 </p>
 
 - The threshold for each block is calculated by taking the arithmetic mean of the blockSizexBlockSize and subtracting it by C (10).  In the example in the previous step, using 12 block rows yields a blockSize of 33.  Given this, we will take the arithmetic average pixel amplitude within each 33x33 block and subtract that average by 10 to determine the threshold for that specific block. As mentioned in Step 6, the blockSize will change based on the original image dimension so the match explained here applies _only_ to that image - however, the logic is the same. In Step 6, I obtained 12 block rows (y) and 15 block columns (x).  Therefore, there will be a total of 180 (12 * 15) thresholds that correspond to each partitioned area.  
 
 <p align="center" width="50%">
-    <img width="15%" src="readme-assets/Adaptive_Threshold.png"> 
+    <img width="25%" src="readme-assets/Adaptive_Threshold.png"> 
 </p>
 
 - After determining the thresholds for each specific block, an algorithm is applied where each pixel in a particular block is converted to either 0 (black) or 255 (white) based on that block's calculated threshold. There are _**2 procedures**_ that are popular:
@@ -159,13 +159,13 @@ if width_boxes % 2 == 0: #this means it is even
 1) `cv2.THRESH_BINARY`: Each pixel greater than or equal to the threshold value will be converted to a defined max value (255) while every pixel below the threshold will be converted to 0 (black)
 
 <p align="center" width="100%">
-    <img width="25%" src="readme-assets/THRESH_BINARY.png"> 
+    <img width="30%" src="readme-assets/THRESH_BINARY.png"> 
 </p>
 
 2) `cv2.THRESH_BINARY_INV`: Each pixel greater than or equal to the threshold value will be converted to 0 (black) while every pixel below the threshold will be converted to a defined max value (255)
 
 <p align="center" width="100%">
-    <img width="25%" src="readme-assets/THRESH_BINARY_INV.png"> 
+    <img width="30%" src="readme-assets/THRESH_BINARY_INV.png"> 
 </p>
 
 - In this project, I used `cv2.THRESH_BINARY_INV` which converted every pixel above the threshold to black while converting pixels below the threshold to white (max value of 255).  The reason I did this is because the darker regions in the image are considered blood vessels and are the regions of interest.  Also, performing this conversion makes contour calculation easier to perform (explained in the next step)
@@ -179,9 +179,31 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
 </p>
 
 8) **Get contours of threshold image**
-   1) The contour algorithm involves these steps..
-   2) After finding the contours, we will draw each of them on the original cropped image and fill them with a black color
-   3) Filling it in black will allow us for further thresholding later on
+  ### Step 8: Get Contours
+- I performed a contour operation to find the edges within the image.  These edges are the white areas shown in Step 7
+- In order to perform a contour operation, I first created a _**Structuring Element**_: which is a type of kernel that performs a particular operation on the image.  
+- When creating a structuring element, popular morphological operations are
+
+1) `cv2.MORPH_RECT`: rectangular structuring element
+
+2) `cv2.MORPH_CROSS`: Cross-shaped structuring element
+
+3) `cv2.MORPH_ELLIPSE`: Circular structuring element. 
+
+- In this project, I used circular structuring element (`cv2.MORPH_CROSS`) and a kernel size of (3x3). In the [image](readme-assets/steps/step8.jpg) below, the circular structuring element was better at maintaining the blood vessel.  A 3x3 ELLIPSE_KERNEL is shown below
+
+\begin{array}
+  0.00 &  1.00 &  0.00\\
+  1.00 &  1.00 &  1.00\\
+  0.00 &  1.00 &  0.00
+\end{array}
+
+- Using `cv2.morphologyEx`, I am able to apply a convolceevery 3x3 block in the image with the above matrix.  
+
+- After convolving the image, we apply `cv2.findContours` with `cv2.RETR_EXTERNAL` which is an algorithm that detects changes in colors and percieves them as boundaries.  In this case, every point where a black pixel is right next to a white pixel is processed as a boundary.  This function will return an array of values, where the length of the array corresponds to each contours region.  
+
+- In the image below, the contour regions are those drawn in black. Although the image looks similar to the ones in previous steps, the reason I did this is because the final step involves taking the euclidean distance of each point along the contours.  This operation gave me the ability to store each (x,y) coordinate of the blood vessels
+
 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step8.jpg"> 

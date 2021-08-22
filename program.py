@@ -101,15 +101,15 @@ class DetectAngiogramDisease:
 
         #determine the min contour area.  Having a higher number will reduce contours over noise but can also pose the problem
         #of missing the vessel
-        min_contour_area = 0
+        min_contour_area = 70
 
         #perform thresholding using Ellipse and a kernel of 3x3.
         #Then apply contours to find the edges within the thresholded image
         #these contours will be used to perform more thresholding later on
-        thresh = cv2.morphologyEx(edged_adap, cv2.MORPH_ELLIPSE, np.ones((3, 3), np.uint8))
+        thresh = cv2.morphologyEx(edged_adap, cv2.MORPH_ELLIPSE, np.ones((4,4), np.uint8))
         #find contours using the external boundaries found in the image.
         contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
-        contours = [i for i in contours if cv2.contourArea(i) > min_contour_area]
+        contours = [i for i in contours if cv2.contourArea(i) >= min_contour_area]
         edged_contour = img.copy()
 
         for idx1, c1 in enumerate(contours):
@@ -318,6 +318,12 @@ class DetectAngiogramDisease:
 
 
 if __name__ == '__main__':
+    import array_to_latex as a2l
+    s_list = [cv2.MORPH_ELLIPSE, cv2.MORPH_CROSS, cv2.MORPH_RECT]
+    for s in s_list:
+        array_ex = cv2.getStructuringElement(s, (4,4))
+        print(a2l.to_ltx(array_ex, arraytype = 'bmatrix'))
+    assert False
     param_dict = {
         'input_dir': 'sample-images',
         'output_dir': 'output-images',
