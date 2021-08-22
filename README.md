@@ -72,23 +72,28 @@ The process consists of **10 steps**
     <img width="35%" src="readme-assets/steps/step3.jpg"> 
 </p>
 
-4) **Apply brightness correction to the gray scaled image**.  This will ensure that the distributions among pixel amplitudes is normalized.  
-Function [_automatic_brightness_and_contrast](program.py) works by: 
-   1) Calculating the cumulative distribution from the histogram of a gray scaled image
+4) **Apply brightness correction to the gray scaled image**.  This will ensure that the distributions among pixel amplitudes is normalized.
+  - Using the formula below (`cv2.convertScaleAbs()`), one has the ability to normalize the distributions of pixel amplitudes across an image given `alpha` and `beta` parameters. 
 
-   2) Find the pixel value with the max number of pixels, and clip it with `clip_hist_percent = 1`
+<p align="center" width="50%">
+    <img width="15%" src="readme-assets/convertScaleAbs.png"> 
+</p>
 
-   3) Split the clipped histogram into two parts (1) left = values below `clip_hist_percent` and (2) right = values above `clip_hist_percent`
+- `cv2.convertScaleAbs` works by performing three operations sequentially. (1) Scaling, (2) Taking an absolute value, (3) Converting to unsigned 8-bit integer.  Each new pixel is the result of performing `abs(alpha + Pixel(x,y) + beta`
 
-   4) Calculate alpha and beta values
+- The function `_automatic_brightness_and_contrast(image, clip_hist_percent)` found in [program.py](program.py) allows for dynamic calculations of `alpha` and `beta` to perform this normalization differently on each image
 
-   `alpha = 255 / (maximum_gray - minimum_gray)`
+- The function works by:
 
-   `beta = -minimum_gray * alpha`
+1) Calculating the cumulative distribution of an image histogram to determine where color frequency is less than some pre-defined threshold `clip_hist_percent`. 
 
-   5) Retrieve final scaled values using 
+2) Cut the right and left side of this histogram to give us our minimum and maximum ranges
 
-   `auto_result = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)`
+3) Calculate `alpha = 255 / (maximum_pixel - minimum_pixel)`
+
+4) Calculate beta.  Given that `g(i, j) = 0` and `f(i, j) = minimum_pixel`
+   1) `g(i,j) = alpha * f(i,j) + beta #0 = alpha * min_pixel + beta`
+   2) `beta = -minimum_pixel * alpha1`
 
 <p align="center" width="100%">
     <img width="99%" src="readme-assets/steps/step4.jpg"> 
@@ -120,9 +125,7 @@ if block_size % 2 == 0: #this means it is even
 
 width_boxes = int(image_width / block_size) #int(491 / 33) = 14 (rounded down)
 if width_boxes % 2 == 0: #this means it is even 
-    width_boxes += 1
-
-```
+    width_boxes += 1```
 
 - The calculation used in [program.py](program.py) is dynamic, so these numbers are specific to the size of the image being processed
 - This blockSize is utilized when applying adaptive threshold, where an algorithm will determine the best threshold based on values calculated within each of these blocks.  (Explanation for how this algorithm works is explained in the next step). 
@@ -131,8 +134,9 @@ if width_boxes % 2 == 0: #this means it is even
 </p>
 
 7) **Apply adaptive thresholding using the block size calculated above**
+### Step 7:  Apply Adaptive thresholding 
 - Here, I applied mean adaptive thresholding using a blockSize of 33 and a constant of 10
-- When applying adaptive thresholding, you have the option of using _**Arithmetic**_ or _**Gaussian**_ mean for calculating the threshold within each image.  In this project, I used Arithmetic mean (`cv2.ADAPTIVE_THRESH_MEAN_C`) as I believe Gaussian mean is not a good method for this application.  In Gaussian mean (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`), the _**weighted**_ average is performed so that the central pixel of the block contributes more weight to the average. In the [example image](readme-assets/steps/step7.jpg) below cell below, we can see that Gaussian mean reduces noise present in the image, however, it does not preserve the integrity of the vessels as well as arithmetic mean.  
+- When applying adaptive thresholding, you have the option of using _**Arithmetic**_ or _**Gaussian**_ mean for calculating the threshold within each image.  In this project, I used Arithmetic mean (`cv2.ADAPTIVE_THRESH_MEAN_C`) as I believe Gaussian mean is not a good method for this application.  In Gaussian mean (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`), the _**weighted**_ average is performed so that the central pixel of the block contributes more weight to the average. In the [example image](readme-assets/steps/step7.jpg) below, we can see that Gaussian mean reduces noise present in the image, however, it does not preserve the integrity of the vessels as well as arithmetic mean.  
 
 `cv.ADAPTIVE_THRESH_MEAN_C`: The threshold value is the mean of the neighbourhood area minus the constant C.
 
@@ -142,7 +146,7 @@ if width_boxes % 2 == 0: #this means it is even
     <img width="15%" src="readme-assets/Gaussian_Mean.png"> 
 </p>
 
-- The threshold for each block is calculated by taking the arithmetic mean of the blockSizexBlockSize and subtracting it by C (10).  In the example in the previous step, using 12 block rows yields a blockSize of 33.  Given this, we will take the arithmetic average pixel amplitude within each 33x33 block and subtract that average by 10 to determine the threshold for that specific block. As mentioned in the previous step, the blockSize will change based on the original image dimension so the match explained here applies _only_ to that image - however, the logic is the same. In the previous step, I obtained 12 block rows (y) and 15 block columns (x).  Therefore, there will be a total of 180 (12 * 15) thresholds that correspond to each partitioned area.  
+- The threshold for each block is calculated by taking the arithmetic mean of the blockSizexBlockSize and subtracting it by C (10).  In the example in the previous step, using 12 block rows yields a blockSize of 33.  Given this, we will take the arithmetic average pixel amplitude within each 33x33 block and subtract that average by 10 to determine the threshold for that specific block. As mentioned in Step 6, the blockSize will change based on the original image dimension so the match explained here applies _only_ to that image - however, the logic is the same. In Step 6, I obtained 12 block rows (y) and 15 block columns (x).  Therefore, there will be a total of 180 (12 * 15) thresholds that correspond to each partitioned area.  
 
 <p align="center" width="50%">
     <img width="15%" src="readme-assets/Adaptive_Threshold.png"> 
@@ -168,12 +172,11 @@ if width_boxes % 2 == 0: #this means it is even
 threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, block_size, 10)
 ```
 
-
 <p align="center" width="100%">
     <img width="85%" src="readme-assets/steps/step7.jpg"> 
 </p>
 
-8) **Get contours of thresholded image**
+8) **Get contours of threshold image**
    1) The contour algorithm involves these steps..
    2) After finding the contours, we will draw each of them on the original cropped image and fill them with a black color
    3) Filling it in black will allow us for further thresholding later on
@@ -182,7 +185,7 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
     <img width="35%" src="readme-assets/steps/step8.jpg"> 
 </p>
 
-9) **Perform another round of thresholding to include only the contoured areas above**.  After, conduct **dilation** to reduce the space between the contours
+9) **Perform another round of thresholds to include only the contoured areas above**.  After, conduct **dilation** to reduce the space between the contours
    1) The threshold used for this is..
    2) Dilation is the process of ..
    
