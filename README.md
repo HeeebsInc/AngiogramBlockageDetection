@@ -50,7 +50,7 @@ that pixel is converted to 0 (black) while if it is higher, it is converted to 2
 opposite direction at the discretion of the operator. ```
 
 <p align="center" width="100%">
-    <img width="75%" src="readme-assets/basic-threshold-formula.png"> 
+    <img width="60%" src="readme-assets/basic-threshold-formula.png"> 
 </p>
 
 ### Description of work accomplished
@@ -147,13 +147,13 @@ if width_boxes % 2 == 0: #this means it is even
 `cv.ADAPTIVE_THRESH_GAUSSIAN_C`: The threshold value is a gaussian-weighted sum of the neighbourhood values minus the constant C.
 
 <p align="center" width="50%">
-    <img width="15%" src="readme-assets/Gaussian_Mean.png"> 
+    <img width="30%" src="readme-assets/Gaussian_Mean.png"> 
 </p>
 
 - The threshold for each block is calculated by taking the arithmetic mean of the (blockSizexBlockSize) and subtracting it by `C = 10`.  In the example in the previous step, using 12 block rows yields a blockSize of 33.  Given this, we will take the arithmetic average pixel amplitude within each 33x33 block and subtract that average by 10 to determine the threshold for that specific block. As mentioned in Step 6, the blockSize will change based on the original image dimension so the math explained here applies _only_ to that image - however, the logic is the same. In Step 6, I obtained 12 block rows (y) and 15 block columns (x).  Therefore, there will be a total of 180 (12 * 15) thresholds that correspond to each partitioned area.  
 
 <p align="center" width="50%">
-    <img width="15%" src="readme-assets/Adaptive_Threshold.png"> 
+    <img width="30%" src="readme-assets/Adaptive_Threshold.png"> 
 </p>
 
 - After determining the thresholds for each specific block, an algorithm is applied where each pixel in a particular block is converted to either 0 (black) or 255 (white) based on that block's calculated threshold. There are _**2 procedures**_ that are popular:
@@ -161,13 +161,13 @@ if width_boxes % 2 == 0: #this means it is even
 1) `cv2.THRESH_BINARY`: Each pixel greater than or equal to the threshold value will be converted to a defined max value (255) while every pixel below the threshold will be converted to 0 (black)
 
 <p align="center" width="100%">
-    <img width="25%" src="readme-assets/THRESH_BINARY.png"> 
+    <img width="35%" src="readme-assets/THRESH_BINARY.png"> 
 </p>
 
 2) `cv2.THRESH_BINARY_INV`: Each pixel greater than or equal to the threshold value will be converted to 0 (black) while every pixel below the threshold will be converted to a defined max value (255)
 
 <p align="center" width="100%">
-    <img width="25%" src="readme-assets/THRESH_BINARY_INV.png"> 
+    <img width="30%" src="readme-assets/THRESH_BINARY_INV.png"> 
 </p>
 
 - In this project, I used `cv2.THRESH_BINARY_INV` which converted every pixel above the threshold to black while converting pixels below the threshold to white (max value of 255).  By doing this, we can interpret the white regions in the image as possible blood cells and thus our regions of interest.
@@ -198,7 +198,7 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
 - In the image below, the contour regions are those drawn in black. Although the image looks similar to the ones in previous steps, the difference here is that I obtained (x,y) coordinates for each point around the blood vessels.  
 
 <p align="center" width="100%">
-    <img width="35%" src="readme-assets/steps/step8.jpg"> 
+    <img width="50%" src="readme-assets/steps/step8.jpg"> 
 </p>
 
 9) ### **Perform another round of threshold and then dilate the image**. 
@@ -208,7 +208,7 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
 - **_Dilation_** (`cv2.dilate()`) Is the process of that increases the bright regions of the image. The process of dilation is as follows
 
 1) Create a kernel and scan the image with that kernel
-2) Within each overlapping block of the kernel and the original image, we replace the center pixel with that maximum value.
+2) Within each overlapping block of the kernel and the original image, we replace the center pixel with the maximum value found in that block.
 3) If more than one iteration is passed, then you repeat this process for the remaining iterations.  The more iterations you pass, the brighter the image will get.  
 
 - As shown in the image below, performing dilation with `iterations = 2` on this image decreased the minimum distance between each contour point, allowing for better blockage estimation in the final step.  
@@ -216,9 +216,16 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
     <img width="99%" src="readme-assets/steps/step9.jpg"> 
 </p>
 
-10) **A final round of contour estimation**. Here, we will get the contours of the dilated image above.  These contours will be used to calculate the euclidean distance between each blood vessel. 
-    1) If a contour (blood vessel) is within 10 pixels of another vessel, this area is considered a possible location of occlusion/blockage
-    2) The contour distance formula is as follows..
+10) ### **A final round of contour estimation**. Here, we will get the contours of the dilated image above.  These contours will be used to calculate the euclidean distance between each blood vessel. 
+    ### Step 10: Get edges of the dilated image
+
+### Step 10: Get edges of the dilated image
+
+- Here, we perform the operations as step 8 on the dilated image retrieved from step 7. 
+- We filter the array of contours to include only contours with a minimum shape area of 1250 pixels so that we limit the amount of calculations and also avoid performing calculations on artifacts.  
+- Once we have the contour points of the dilated image, we apply a contour euclidean distance formula [_find_if_close](program.py) to get the distance of each contour to all other contours.  
+- The algorithm for finding the euclidean distance operates using brute force iterations.  For future iterations of this project, I plan on implementing this using broadcasting which would increase the speed of this calculation. 
+- If the distance between two _different_ contours is less than or equal to `min_dist = 10`, then we can assume that is a blockage area of the blood vessel. 
 
 <p align="center" width="100%">
     <img width="85%" src="readme-assets/steps/step10.jpg"> 
@@ -258,13 +265,16 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
 </p>
 
 2) If you pressed Y, a window will pop up displaying one of your images in the sample-images directory
-![BboxDemo](readme-assets/example1.gif)
-3) Once the application is done iterating through the images inside [sample-images](sample-images), the output images will be saved in [output-images](output-images)
+![BboxDemo](readme-assets/example.gif)
+3) 
+4) Once the application is done iterating through the images inside [sample-images](sample-images), the output images will be saved in [output-images](output-images)
    1) The default configuration will save only the output image with the detection, however, if you want to every step of the process, change `save_all_steps` on the bottom of [program.py](program.py) to `True` 
 
 <p align="center" width="100%">
     <img width="75%" src="readme-assets/cover-photo.jpg"> 
 </p>
+
+4) Once the program is done processing each image, it will display the detections in another window. Upon closing this window, the output-image and steps taken for each original image will be saved in [output-images](output-images)
 
 #### Possible errors and how to fix them
 1) `ImportError: libGL.so.1: cannot open shared object file: No such file or directory`
