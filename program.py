@@ -321,7 +321,7 @@ if __name__ == '__main__':
     # import array_to_latex as a2l
     # s_list = [cv2.MORPH_ELLIPSE, cv2.MORPH_CROSS, cv2.MORPH_RECT]
     # for s in s_list:
-    #     array_ex = cv2.getStructuringElement(s, (4,4))
+    #     array_ex = cv2.getStructuringElement(s, (5,5))
     #     print(a2l.to_ltx(array_ex, arraytype = 'bmatrix'))
     # assert False
     param_dict = {

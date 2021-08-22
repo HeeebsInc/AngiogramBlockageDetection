@@ -116,7 +116,7 @@ The process consists of **10 steps**
     <img width="85%" src="readme-assets/steps/step5.jpg"> 
 </p>
 
-6) ###**Create `blockSize` using 12 boxes along the height of the image**
+6) ### **Create `blockSize` using 12 boxes along the height of the image**
 - This process involves separating the image into equal partitions so that there are a specific number of blocks along the y-axis. In this project, I ensured that there are 12 blocks along the height of the image. 
 - Because each block is created around a central pixel, the blockSize of an image must be an odd number and each block must have square dimensions.
 - For example, if we want 12 blocks along the y-axis in an image with a dimension of 491x393 (WxH) pixels, it will require each block to have a height and width of 33 pixels. Given the height/width of each block, we can divide the width of the image by 33 to determine how many boxes will fit along the x-axis.   
@@ -138,8 +138,7 @@ if width_boxes % 2 == 0: #this means it is even
     <img width="35%" src="readme-assets/steps/step6.jpg"> 
 </p>
 
-7) ###**Apply adaptive thresholding using the block size calculated above**
-### Step 7:  Apply Adaptive thresholding 
+7) ### **Apply adaptive thresholding using the block size calculated above**
 - Here, I applied mean adaptive thresholding using a blockSize of 33 and a constant of 10
 - When applying adaptive thresholding, you have the option of using _**Arithmetic**_ or _**Gaussian**_ mean for calculating the threshold within each image.  In this project, I used Arithmetic mean (`cv2.ADAPTIVE_THRESH_MEAN_C`) as I believe Gaussian mean is not a good method for this application.  In Gaussian mean (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`), the _**weighted**_ average is performed so that the central pixel of the block contributes more weight to the average. In the [example image](readme-assets/steps/step7.jpg) below, we can see that Gaussian mean reduces noise present in the image, however, it does not preserve the integrity of the vessels as well as arithmetic mean.  
 
@@ -171,7 +170,7 @@ if width_boxes % 2 == 0: #this means it is even
     <img width="25%" src="readme-assets/THRESH_BINARY_INV.png"> 
 </p>
 
-- In this project, I used `cv2.THRESH_BINARY_INV` which converted every pixel above the threshold to black while converting pixels below the threshold to white (max value of 255).  By doing this, we can interpret the black regions in the image as possible blood cells and thus our regions of interest.
+- In this project, I used `cv2.THRESH_BINARY_INV` which converted every pixel above the threshold to black while converting pixels below the threshold to white (max value of 255).  By doing this, we can interpret the white regions in the image as possible blood cells and thus our regions of interest.
 
 ```
 threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, block_size, 10)
@@ -197,6 +196,7 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
 - After convolving the image, we apply `cv2.findContours` with `cv2.RETR_EXTERNAL` which is an algorithm that detects changes in colors and perceives them as boundaries.  In this case, every point where a black pixel is right next to a white pixel is processed as a boundary.  This function will return an array of values, where the length of the array corresponds to each contours region.  I parsed the array to only include contours with a minimum area of 70 pixels
 
 - In the image below, the contour regions are those drawn in black. Although the image looks similar to the ones in previous steps, the difference here is that I obtained (x,y) coordinates for each point around the blood vessels.  
+
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step8.jpg"> 
 </p>
