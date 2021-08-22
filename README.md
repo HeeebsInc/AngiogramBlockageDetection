@@ -136,7 +136,7 @@ if width_boxes % 2 == 0: #this means it is even
     <img width="35%" src="readme-assets/steps/step6.jpg"> 
 </p>
 
-7) **Apply adaptive thresholding using the block size calculated above**
+7) ###**Apply adaptive thresholding using the block size calculated above**
 - Here, I applied mean adaptive thresholding using a blockSize of 33 and a constant of 10
 - When applying adaptive thresholding, you have the option of using _**Arithmetic**_ or _**Gaussian**_ mean for calculating the threshold within each image.  In this project, I used Arithmetic mean (`cv2.ADAPTIVE_THRESH_MEAN_C`) as I believe Gaussian mean is not a good method for this application.  In Gaussian mean (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`), the _**weighted**_ average is performed so that the central pixel of the block contributes more weight to the average. In the [example image](readme-assets/steps/step7.jpg) below, we can see that Gaussian mean reduces noise present in the image, however, it does not preserve the integrity of the vessels as well as arithmetic mean.  
 
@@ -178,32 +178,22 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
     <img width="85%" src="readme-assets/steps/step7.jpg"> 
 </p>
 
-8) **Get contours of threshold image**
-  ### Step 8: Get Contours
+8) ### **Get contours of threshold image**
 - I performed a contour operation to find the edges within the image.  These edges are the white areas shown in Step 7
 - In order to perform a contour operation, I first created a _**Structuring Element**_: which is a type of kernel that performs a particular operation on the image.  
 - When creating a structuring element, popular morphological operations are
 
-1) `cv2.MORPH_RECT`: rectangular structuring element
+<p align="center" width="100%">
+    <img width="35%" src="readme-assets/morph_operations.png"> 
+</p>
 
-2) `cv2.MORPH_CROSS`: Cross-shaped structuring element
+- In this project, I used circular structuring element (`cv2.MORPH_CROSS`) and a kernel size of (3x3). In the [image](readme-assets/steps/step8.jpg) below, the circular structuring element was better at maintaining the blood vessel. 
 
-3) `cv2.MORPH_ELLIPSE`: Circular structuring element. 
+- Using `cv2.morphologyEx`, I apply a convolution between each 3x3 block in the image with the ELLIPSE_MATRICS above matrix.  
 
-- In this project, I used circular structuring element (`cv2.MORPH_CROSS`) and a kernel size of (3x3). In the [image](readme-assets/steps/step8.jpg) below, the circular structuring element was better at maintaining the blood vessel.  A 3x3 ELLIPSE_KERNEL is shown below
-
-\begin{array}
-  0.00 &  1.00 &  0.00\\
-  1.00 &  1.00 &  1.00\\
-  0.00 &  1.00 &  0.00
-\end{array}
-
-- Using `cv2.morphologyEx`, I am able to apply a convolceevery 3x3 block in the image with the above matrix.  
-
-- After convolving the image, we apply `cv2.findContours` with `cv2.RETR_EXTERNAL` which is an algorithm that detects changes in colors and percieves them as boundaries.  In this case, every point where a black pixel is right next to a white pixel is processed as a boundary.  This function will return an array of values, where the length of the array corresponds to each contours region.  
+- After convolving the image, we apply `cv2.findContours` with `cv2.RETR_EXTERNAL` which is an algorithm that detects changes in colors and percieves them as boundaries.  In this case, every point where a black pixel is right next to a white pixel is processed as a boundary.  This function will return an array of values, where the length of the array corresponds to each contours region.  I parsed the array to only include contours with a minimum area of 70 pixels
 
 - In the image below, the contour regions are those drawn in black. Although the image looks similar to the ones in previous steps, the reason I did this is because the final step involves taking the euclidean distance of each point along the contours.  This operation gave me the ability to store each (x,y) coordinate of the blood vessels
-
 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step8.jpg"> 
