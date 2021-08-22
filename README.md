@@ -54,36 +54,37 @@ opposite direction at the discretion of the operator. ```
 ### Description of work accomplished
 To follow the code process, see [technical jupyter notebook](technical-notebook.ipynb)
 The process consists of **10 steps**
-1) **Load image into memory**
+
+1) ### **Load image into memory**
 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step1.jpg"> 
 </p>
 
-2) **Crop image borders by 10%**. In X-ray images, there often can be black/white borders around the image that would negatively impact this segmentation algorithm.  
+2) ### **Crop image borders by 10%**. 
+- In X-ray images, there often can be black/white borders around the image that would negatively impact this segmentation algorithm.  
 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step2.jpg"> 
 </p>
 
-3) **Convert cropped image to gray scale (1-dimensional)**
+3) ### **Convert cropped image to gray scale (1-dimensional)**
 
 <p align="center" width="100%">
     <img width="35%" src="readme-assets/steps/step3.jpg"> 
 </p>
 
-4) **Apply brightness correction to the gray scaled image**.  This will ensure that the distributions among pixel amplitudes is normalized.
-  - Using the formula below (`cv2.convertScaleAbs()`), one has the ability to normalize the distributions of pixel amplitudes across an image given `alpha` and `beta` parameters. 
+4) ### **Apply brightness correction to the gray scaled image**.
+- This will ensure that the distributions among pixel amplitudes is normalized.
+- Using the formula below (`cv2.convertScaleAbs()`), one has the ability to normalize the distributions of pixel amplitudes across an image given `alpha` and `beta` parameters. 
 
 <p align="center" width="50%">
-    <img width="15%" src="readme-assets/convertScaleAbs.png"> 
+    <img width="25%" src="readme-assets/convertScaleAbs.png"> 
 </p>
 
 - `cv2.convertScaleAbs` works by performing three operations sequentially. (1) Scaling, (2) Taking an absolute value, (3) Converting to unsigned 8-bit integer.  Each new pixel is the result of performing `abs(alpha + Pixel(x,y) + beta`
 
-- The function `_automatic_brightness_and_contrast(image, clip_hist_percent)` found in [program.py](program.py) allows for dynamic calculations of `alpha` and `beta` to perform this normalization differently on each image
-
-- The function works by:
+- The function `_automatic_brightness_and_contrast(image, clip_hist_percent)` found in [program.py](program.py) allows for dynamic calculations of `alpha` and `beta` to perform this normalization differently on each image.  This function works by: 
 
 1) Calculating the cumulative distribution of an image histogram to determine where color frequency is less than some pre-defined threshold `clip_hist_percent`. 
 
@@ -99,20 +100,21 @@ The process consists of **10 steps**
     <img width="99%" src="readme-assets/steps/step4.jpg"> 
 </p>
 
-5) **Blur the image**.  This step will reduce noise around the image and allow for better segmentation
-   - **Median Blur** is a commonly used method for reducing salt and pepper noise.  
-   - To apply a median blur, you first determine a _**kernel size**_.  In this project, I used a kernel size of 5.  The kernel size is used to determine the number of neighbors that will be incorporated in the blur method.
-     - ```cv2.medianBlur(image, ksize = 5)```
+5) ### **Blur the image**.  
+- This step will reduce noise around the image and allow for better segmentation
+- **Median Blur** is a commonly used method for reducing salt and pepper noise.  
+- To apply a median blur, you first determine a _**kernel size**_.  In this project, I used a kernel size of 5.  The kernel size is used to determine the number of neighbors that will be incorporated in the blur method.
+  - ```cv2.medianBlur(image, ksize = 5)```
 
-   - For example, with a neighborhood size of 5x5, 25 pixels will be used to calculate the median of all pixels. 
-   - After gathering the median value, the center pixel in that 5x5 area will become that median value.  
-   - The reason this method is so useful for salt and pepper noise is because the center pixel will _always_ be replaced with a pixel that is in the original image- as using the median calculation is more robust to outliers than compared to using an average or gaussian blur method.   
+- For example, with a neighborhood size of 5x5, 25 pixels will be used to calculate the median of all pixels. 
+- After gathering the median value, the center pixel in that 5x5 area will become that median value.  
+- The reason this method is so useful for salt and pepper noise is because the center pixel will _always_ be replaced with a pixel that is in the original image- as using the median calculation is more robust to outliers than compared to using an average or gaussian blur method.   
 
 <p align="center" width="100%">
     <img width="85%" src="readme-assets/steps/step5.jpg"> 
 </p>
 
-6) **Create `blockSize` using 12 boxes along the height of the image**
+6) ###**Create `blockSize` using 12 boxes along the height of the image**
 - This process involves separating the image into equal partitions so that there are a specific number of blocks along the y-axis. In this project, I ensured that there are 12 blocks along the height of the image. 
 - Because each block is created around a central pixel, the blockSize of an image must be an odd number and each block must have square dimensions.
 - For example, if an image has a dimension of 491x393 (WxH) pixels and we wish to have 12 blocks along the y-axis (height), it will require each block to have a height and width of 33 pixels. Given the height and width of each block, we can divide the width of the image by 33 to determine how many boxes we can fit along the x-axis.   
@@ -125,7 +127,8 @@ if block_size % 2 == 0: #this means it is even
 
 width_boxes = int(image_width / block_size) #int(491 / 33) = 14 (rounded down)
 if width_boxes % 2 == 0: #this means it is even 
-    width_boxes += 1```
+    width_boxes += 1
+```
 
 - The calculation used in [program.py](program.py) is dynamic, so these numbers are specific to the size of the image being processed
 - This blockSize is utilized when applying adaptive threshold, where an algorithm will determine the best threshold based on values calculated within each of these blocks.  (Explanation for how this algorithm works is explained in the next step). 
@@ -134,7 +137,6 @@ if width_boxes % 2 == 0: #this means it is even
 </p>
 
 7) **Apply adaptive thresholding using the block size calculated above**
-### Step 7:  Apply Adaptive thresholding 
 - Here, I applied mean adaptive thresholding using a blockSize of 33 and a constant of 10
 - When applying adaptive thresholding, you have the option of using _**Arithmetic**_ or _**Gaussian**_ mean for calculating the threshold within each image.  In this project, I used Arithmetic mean (`cv2.ADAPTIVE_THRESH_MEAN_C`) as I believe Gaussian mean is not a good method for this application.  In Gaussian mean (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`), the _**weighted**_ average is performed so that the central pixel of the block contributes more weight to the average. In the [example image](readme-assets/steps/step7.jpg) below, we can see that Gaussian mean reduces noise present in the image, however, it does not preserve the integrity of the vessels as well as arithmetic mean.  
 
