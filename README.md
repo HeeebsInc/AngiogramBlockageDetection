@@ -263,7 +263,7 @@ threshold_img = cv2.adaptiveThreshold(original_image, 255, cv2.ADAPTIVE_THRESH_M
 </p>
 
 2) If you pressed Y, a window will pop up displaying one of your images in the sample-images directory
-![BboxDemo](readme-assets/example.gif)
+![BboxDemo](readme-assets/example_final.gif)
 3) 
 4) Once the application is done iterating through the images inside [sample-images](sample-images), the output images will be saved in [output-images](output-images)
    1) The default configuration will save only the output image with the detection, however, if you want to every step of the process, change `save_all_steps` on the bottom of [program.py](program.py) to `True` 
